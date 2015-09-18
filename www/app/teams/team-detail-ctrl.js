@@ -10,18 +10,33 @@
         vm.teamId = Number($stateParams.id);
         var data = eliteApi.getLeagueData();
 
+
+        function isTeamInGame(item) {
+            return item.team1Id === vm.teamId || item.team2Id === vm.teamId;
+        }
+
+        function getScoreDisplay(isTeam1, team1Score, team2Score) {
+            if (team1Score && team2Score) {
+                var teamScore = (isTeam1 ? team1Score : team2Score);
+                var opponentScore = (isTeam1 ? team2Score : team1Score);
+                var winIndicator = teamScore > opponentScore ? "w: " : "L: ";
+                return winIndicator + teamScore + "-" + opponentScore;
+            }
+            else {
+                return "";
+            }
+        }
+
         var team = _.chain(data.teams)
-                    .flatten("divisionTeams")
+                    .pluck("divisionTeams")
+                    .flatten()
                     .find({ "id": vm.teamId })
                     .value();
         
         vm.teamName = team.name;
 
         vm.games = _.chain(data.games)
-                    .filter(isTeamInGame)// F12  takes you to the definition. Then Ctrl + - takes you back. Try it
-        // Restart this computer ok 5als rouh inta berja3 bshuf shu 
-           //lo//osa Check  that data.games has values. Then trace the code inside the "map" function.
-            // It should work. okay i'll try
+                    .filter(isTeamInGame)
                     .map(function (item) {
                         var isTeam1 = (item.team1Id === vm.teamId ? true : false);
                         var opponentName = isTeam1 ? item.team2 : item.team1;
@@ -37,22 +52,6 @@
                         };
 
                     })
-                     .value();
-
-        function isTeamInGame(item) {
-            return item.team1Id === vm.teamId || item.team2Id === vm.teamId;
-        }
-        
-        function getScoreDisplay(isTeam1, team1Score, team2Score) {
-            if (team1Score && team2Score) {
-                var teamScore = (isTeam1 ? team1Score : team2Score);
-                var opponentScore = (isTeam1 ? team2Score : team1score);
-                var winIndicator = teamScore > opponentScore ? "w: " : "L: ";
-                return winIndicator + teamScore + "-" + opponentScore;
-            }
-            else {
-                return "";
-            }
-        }
+                     .value();       
     };
 })();

@@ -4,7 +4,7 @@
     $ionicPlatform.ready(function () {
         //hide the accessory bar by default (remove this to show the accessory bar above
         //for form inputs
-        if (window.cordova && window.cordova.plugins.keyboard) {
+        if (window.cordova && window.cordova.plugins && window.cordova.plugins.keyboard) {
             cordova.plugins.keyboard.hidekeyboardAccessoryBar(true);
         }
         if (window.StatusBar) {
