@@ -11,6 +11,34 @@
         var data = eliteApi.getLeagueData();
 
 
+        
+
+        var team = _.chain(data.teams)
+                    .pluck("divisionTeams")
+                    .flatten()
+                    .find({ "id": vm.teamId })
+                    .value();
+        
+        vm.teamName = team.name;
+
+        vm.games = _.chain(data.games)
+                    .filter(isTeamInGame)
+                    .map(function (item) {
+                        var isTeam1 = (item.team1Id === vm.teamId ? true : false);
+                        var opponentName = isTeam1 ? item.team2 : item.team1;
+                        var scoreDisplay = getScoreDisplay(isTeam1, item.team1Score,item.team2Score);
+                        return {
+                            gameId: item.id,
+                            opponent: opponentName,
+                            time: item.time,
+                            location: item.location,
+                            locationUrl: item.locationUrl,
+                            scoreDisplay: scoreDisplay,
+                            homeAway: (isTeam1 ? "vs." : "at")
+                        };
+
+                    })
+                     .value();
         function isTeamInGame(item) {
             return item.team1Id === vm.teamId || item.team2Id === vm.teamId;
         }
@@ -26,32 +54,5 @@
                 return "";
             }
         }
-
-        var team = _.chain(data.teams)
-                    .pluck("divisionTeams")
-                    .flatten()
-                    .find({ "id": vm.teamId })
-                    .value();
-        
-        vm.teamName = team.name;
-
-        vm.games = _.chain(data.games)
-                    .filter(isTeamInGame)
-                    .map(function (item) {
-                        var isTeam1 = (item.team1Id === vm.teamId ? true : false);
-                        var opponentName = isTeam1 ? item.team2 : item.team1;
-                        var scoreDisplay = getScoreDisplay(isTeam1, item.item1Score,item.team2Score);
-                        return {
-                            gameId: item.id,
-                            opponent: opponentName,
-                            time: item.time,
-                            location: item.location,
-                            locationUrl: item.locationUrl,
-                            scoreDisplay: scoreDisplay,
-                            homeAway: (isTeam1 ? "vs." : "at")
-                        };
-
-                    })
-                     .value();       
     };
 })();
